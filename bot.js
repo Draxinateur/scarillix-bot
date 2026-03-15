@@ -13,23 +13,27 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-client.on("ready", () => {
+client.once("ready", () => {
   console.log("Bot Scarillix connecté !");
 });
 
-client.on("messageCreate", async message => {
+client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   if (!message.content.startsWith("!ask")) return;
 
-  const question = message.content.replace("!ask ", "");
+  const question = message.content.replace("!ask", "").trim();
+
+  if (!question) {
+    message.reply("Pose une question après !ask");
+    return;
+  }
 
   try {
-
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Tu es Scarillix AI, un assistant Discord sympa et utile." },
+        { role: "system", content: "Tu es Scarillix AI, un assistant Discord sympa qui répond en français." },
         { role: "user", content: question }
       ]
     });
